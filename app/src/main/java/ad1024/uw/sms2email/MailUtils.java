@@ -4,11 +4,11 @@ import android.content.SharedPreferences;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
-import java.util.Properties;
+
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
+
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
