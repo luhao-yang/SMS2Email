@@ -15,7 +15,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Send SMS to:" />
+            android:text="Email (both sender and receiver):" />
 
         <EditText
             android:id="@+id/email_edit"
@@ -26,13 +26,25 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Password:" />
+
+        <EditText
+            android:id="@+id/password_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:hint="your password" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="Server Address:" />
 
         <EditText
             android:id="@+id/server_addr_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="smtp.163.com" />
+            android:hint="smtp.google.com" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -43,18 +55,8 @@
             android:id="@+id/server_port_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="110" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Password:" />
+            android:hint="587" />
 
-        <EditText
-            android:id="@+id/password_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:hint="smtp.163.com" />
 
 
         <LinearLayout

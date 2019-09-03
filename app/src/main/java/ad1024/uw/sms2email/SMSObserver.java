@@ -45,7 +45,8 @@ public class SMSObserver extends ContentObserver {
                         where, null, "date desc");
 
 
-                if (cursor == null || cursor.getCount() == 0) {
+                if (cursor.getCount() == 0) {
+                    Log.i("SMSService", "can't find message");
                     return null;
                 }
 
@@ -89,7 +90,7 @@ public class SMSObserver extends ContentObserver {
 
     @Override
     public void onChange(boolean selfChange) {
-        Log.i("SMSObserver", "Change Detected, selfChange = " + selfChange);
+        Log.i("SMSService", "Change Detected, selfChange: " + selfChange);
         new EmailSendTask(this.context).execute();
         super.onChange(selfChange);
     }

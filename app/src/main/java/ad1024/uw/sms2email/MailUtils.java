@@ -51,7 +51,6 @@ public class MailUtils {
 
     }
 
-
     public static MimeMessage newEmail(String title, String content) {
         MimeMessage message = new MimeMessage(session);
         try {
@@ -75,10 +74,16 @@ public class MailUtils {
         return message;
     }
 
-    public static void sendEmail(MimeMessage mail) throws Exception {
-        Transport transport = session.getTransport();
-        transport.connect(email, password);
-        transport.sendMessage(mail, mail.getAllRecipients());
-        transport.close();
+    public static void sendEmail(MimeMessage mail) {
+        Transport transport = null;
+        try {
+            transport = session.getTransport();
+            transport.connect(email, password);
+            transport.sendMessage(mail, mail.getAllRecipients());
+            transport.close();
+        } catch (MessagingException e) {
+            Log.e("SMSService", "sending message failed");
+            e.printStackTrace();
+        }
     }
 }
