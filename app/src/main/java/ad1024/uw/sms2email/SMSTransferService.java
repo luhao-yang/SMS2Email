@@ -3,22 +3,11 @@ package ad1024.uw.sms2email;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
-import java.util.Date;
-import java.util.Properties;
-import java.util.regex.Pattern;
-
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 
 public class SMSTransferService extends Service {
     private SMSObserver mObserver;
@@ -30,9 +19,19 @@ public class SMSTransferService extends Service {
     public void onCreate() {
         mObserver = new SMSObserver(new Handler(), this);
         Log.i("SMSService", "Started");
-        getContentResolver().registerContentObserver(Uri.parse("content://sms/"),
+        getContentResolver().registerContentObserver(Uri.parse("content://sms/inbox"),
                 true, mObserver);
         super.onCreate();
+
+
+        SharedPreferences preferences = getSharedPreferences("email_storage", MODE_PRIVATE);
+
+        String host =  preferences.getString(Consts.Preference.SERVER_ADDRESS, "");
+        int port = Integer.parseInt(preferences.getString(Consts.Preference.SERVER_PORT, ""));
+        String email = preferences.getString(Consts.Preference.EMAIL, "");
+        String password = preferences.getString(Consts.Preference.PASSWORD, "");
+
+        MailUtils.init(host, port, email, password);
     }
 
     @Override
