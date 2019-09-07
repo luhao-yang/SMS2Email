@@ -34,28 +34,32 @@ public class SMSObserver extends ContentObserver {
         @Override
         protected Void doInBackground(Void... voids) {
             Cursor cursor = null;
-            Log.i("SMSService", "Handling new message");
+
             try {
 
-                // todo dual sim cards
-                String where = "read = 0";
+                String where = "";
                 cursor = this.context.getContentResolver().query(
                         Uri.parse("content://sms/inbox"),
-                        new String[]{"_id", "address", "body", "date"},
+                        new String[]{"*"},
                         where, null, "date desc");
 
 
                 if (cursor.getCount() == 0) {
-                    Log.i("SMSService", "can't find message");
+                    Log.i("SMSService", "can't find message with query:" + where);
                     return null;
                 }
 
+                // only read the latest message
                 cursor.moveToFirst();
+
+                // todo dual SIM, how to identify message goes into which SIM card?
+                // getNetworkOperatorName? sub_id?
 
                 // sms columns https://stackoverflow.com/questions/4022088/how-many-database-columns-associated-with-a-sms-in-android
                 String body = cursor.getString(cursor.getColumnIndex("body"));
                 String sender = cursor.getString(cursor.getColumnIndex("address"));
                 String dateStamp = cursor.getString(cursor.getColumnIndex("date"));
+                String simId = cursor.getString(cursor.getColumnIndex("sim_id"));
 
 //                StringBuffer info = new StringBuffer();
 //                for( int i = 0; i < cursor.getColumnCount(); i++) {
@@ -68,14 +72,14 @@ public class SMSObserver extends ContentObserver {
                 Date date = new Date(Long.parseLong(dateStamp));
 
                 String title = "New SMS message from " + sender;
-                String content = "<p>" + body + "</p> <p>" +
-                        "date: " + date + ""
-                        +"</p>";
+                String content = "<p>" + body + "</p>" +
+                        "<p> SIM ID: " + simId + "</p>" +
+                        "<p> Date: " + date + "</p>";
 
                 MimeMessage newEmail = MailUtils.newEmail(title, content);
                 MailUtils.sendEmail(newEmail);
 
-                ToastUtils.makeText("Email sent!", Toast.LENGTH_SHORT);
+                ToastUtils.makeText("New message sent to email!", Toast.LENGTH_SHORT);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -89,9 +93,20 @@ public class SMSObserver extends ContentObserver {
     }
 
     @Override
-    public void onChange(boolean selfChange) {
-        Log.i("SMSService", "Change Detected, selfChange: " + selfChange);
-        new EmailSendTask(this.context).execute();
+    public void onChange(boolean selfChange, Uri uri) {
         super.onChange(selfChange);
+        Log.i("SMSService", "Change Detected, uri: " + uri.toString());
+
+        // some android phone would trigger onChange with this uri
+        if (uri.toString().equals("content://sms/raw")) {
+            Log.i("SMSService", "raw has been dropped.");
+            return;
+        }
+
+        if(uri.toString().matches("content://sms/\\d+$")) {
+            Log.i("SMSService", "handling new message...");
+            new EmailSendTask(this.context).execute();
+        }
+
     }
 }

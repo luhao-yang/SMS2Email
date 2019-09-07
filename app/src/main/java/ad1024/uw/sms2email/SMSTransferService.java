@@ -19,7 +19,7 @@ public class SMSTransferService extends Service {
     public void onCreate() {
         mObserver = new SMSObserver(new Handler(), this);
         Log.i("SMSService", "Started");
-        getContentResolver().registerContentObserver(Uri.parse("content://sms/inbox"),
+        getContentResolver().registerContentObserver(Uri.parse("content://sms"),
                 true, mObserver);
         super.onCreate();
 
@@ -32,6 +32,7 @@ public class SMSTransferService extends Service {
         String password = preferences.getString(Consts.Preference.PASSWORD, "");
 
         MailUtils.init(host, port, email, password);
+
     }
 
     @Override

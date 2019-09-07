@@ -22,12 +22,19 @@ public class MailUtils {
     private static String password;
     private static Session session = null;
 
+
     public static void init(String _host, int _port, String _email, String _password) {
         host = _host;
         port = _port;
         email = _email;
         password = _password;
 
+        Log.i("SMSService", "host="+host+", port="+port+", email="+email+", password="+password);
+
+        usingTSL();
+    }
+
+    public static void usingTSL() {
         Properties props = new Properties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
@@ -35,19 +42,16 @@ public class MailUtils {
         props.put("mail.smtp.port", port);
         // Port: 465 (SSL required) or 587 (TLS required)
         props.put("mail.smtp.starttls.enable", "true"); //TLS
+        props.put("mail.smtp.ssl.enable", "true");
 
         // see https://www.mkyong.com/java/javamail-api-sending-email-via-gmail-smtp-example/
 
-        session = Session.getInstance(props, new javax.mail.Authenticator() {
+        session = Session.getDefaultInstance(props, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(email, password);
             }
         });
-
-//        Session session = Session.getDefaultInstance(props);
-//        session.setDebug(true);
-
-        Log.i("SMSService", "initialisation complete.");
+        Log.i("SMSService", "Using TSL");
 
     }
 
