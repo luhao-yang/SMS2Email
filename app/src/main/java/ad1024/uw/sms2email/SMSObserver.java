@@ -53,7 +53,7 @@ public class SMSObserver extends ContentObserver {
                 cursor.moveToFirst();
 
                 // todo dual SIM, how to identify message goes into which SIM card?
-                // getNetworkOperatorName? sub_id?
+                // get effective name from simId?
 
                 // sms columns https://stackoverflow.com/questions/4022088/how-many-database-columns-associated-with-a-sms-in-android
                 String body = cursor.getString(cursor.getColumnIndex("body"));
@@ -79,7 +79,7 @@ public class SMSObserver extends ContentObserver {
                 MimeMessage newEmail = MailUtils.newEmail(title, content);
                 MailUtils.sendEmail(newEmail);
 
-                ToastUtils.makeText("New message sent to email!", Toast.LENGTH_SHORT);
+                ToastUtils.makeText("New Email Sent!", Toast.LENGTH_SHORT);
 
             } catch (Exception e) {
                 e.printStackTrace();
