@@ -2,9 +2,7 @@ package ad1024.uw.sms2email;
 
 import android.app.ActivityManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -15,11 +13,8 @@ import android.widget.Toast;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.mail.internet.MimeMessage;
-
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Button btn_send_email;
 
     private Button btn_save_email;
     private Button btn_toggle_service;
@@ -42,10 +37,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         // StrictMode.setThreadPolicy(policy);
 
-//        btn_send_email = findViewById(R.id.btn_send_email);
 
         btn_save_email = findViewById(R.id.btn_save_email);
-        btn_toggle_service = findViewById(R.id.btn_toggle_service);
+//        btn_toggle_service = findViewById(R.id.btn_toggle_service);
         serverAddrEdit = findViewById(R.id.server_addr_edit);
         serverPortEdit = findViewById(R.id.server_port_edit);
         passwordEdit = findViewById(R.id.password_edit);
@@ -54,15 +48,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         int currentUid = android.os.Process.myUid();
         serviceRunning = isServiceRunning(currentUid, "SMSTransferService");
-        if(serviceRunning) {
-            btn_toggle_service.setText("STOP SERVICE!");
-        } else {
-            btn_toggle_service.setText("LINK START!");
-        }
+//        if(serviceRunning) {
+//            btn_toggle_service.setText("STOP SERVICE!");
+//        } else {
+//            btn_toggle_service.setText("LINK START!");
+//        }
 
-//        btn_send_email.setOnClickListener(this);
         btn_save_email.setOnClickListener(this);
-        btn_toggle_service.setOnClickListener(this);
+//        btn_toggle_service.setOnClickListener(this);
         loadConfiguration();
 
     }
@@ -108,18 +101,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String email = ed_email.getText().toString();
             if (!email.isEmpty()) {
                 if (Pattern.matches(REGEX_EMAIL, email)) {
-                    // Write current email into shared preferences
-                    SharedPreferences.Editor prefEditor = emailInformationStorage.edit();
-                    prefEditor.putString(Consts.Preference.EMAIL, email);
-                    prefEditor.putString(Consts.Preference.SERVER_ADDRESS,
-                            serverAddrEdit.getText().toString());
-                    prefEditor.putString(Consts.Preference.SERVER_PORT,
-                            serverPortEdit.getText().toString());
-                    prefEditor.putString(Consts.Preference.PASSWORD,
-                            passwordEdit.getText().toString());
-                    prefEditor.apply();
-                    ToastUtils.makeText("Email: " + email + " Saved!",
-                            Toast.LENGTH_LONG);
+
+                    String host =  serverAddrEdit.getText().toString();
+                    int port = Integer.parseInt(serverPortEdit.getText().toString());
+                    String password = passwordEdit.getText().toString();
+
+                    MailUtils.init(host, port, email, password);
+
                 } else {
                     ToastUtils.makeText("Are u sure this is an Email address? O_O",
                             Toast.LENGTH_LONG);
@@ -127,44 +115,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 ToastUtils.makeText("Email Should not be EMPTY! Q3Q", Toast.LENGTH_SHORT);
             }
-        } else if(view.getId() == R.id.btn_toggle_service) {
-            if(serviceRunning) {
-                btn_toggle_service.setText("LINK START!");
-                stopService(new Intent(MainActivity.this, SMSTransferService.class));
-                ToastUtils.makeText("Service STOPPED", Toast.LENGTH_SHORT);
-                serviceRunning = false;
-            } else {
-                if(checkEmailConfiguration()) {
-                    ToastUtils.makeText("Please fill in all settings", Toast.LENGTH_SHORT);
-                }
-                btn_toggle_service.setText("STOP SERVICE!");
-                startService(new Intent(MainActivity.this, SMSTransferService.class));
-                ToastUtils.makeText("Service STARTED", Toast.LENGTH_SHORT);
-                serviceRunning = true;
-            }
         }
-//        else if(view.getId() == R.id.btn_send_email) {
-//            SharedPreferences preferences = getSharedPreferences("email_storage", MODE_PRIVATE);
-//
-//            String host =  preferences.getString(Consts.Preference.SERVER_ADDRESS, "");
-//            int port = Integer.parseInt(preferences.getString(Consts.Preference.SERVER_PORT, ""));
-//            String email = preferences.getString(Consts.Preference.EMAIL, "");
-//            String password = preferences.getString(Consts.Preference.PASSWORD, "");
-//
-//            MailUtils.init(host, port, email, password);
-//
-//            new SendEmailTask().execute();
-//            ToastUtils.makeText("Testing email sent", Toast.LENGTH_SHORT);
+//        else if(view.getId() == R.id.btn_toggle_service) {
+//            if(serviceRunning) {
+//                btn_toggle_service.setText("LINK START!");
+//                stopService(new Intent(MainActivity.this, SMSTransferService.class));
+//                ToastUtils.makeText("Service STOPPED", Toast.LENGTH_SHORT);
+//                serviceRunning = false;
+//            } else {
+//                if(checkEmailConfiguration()) {
+//                    ToastUtils.makeText("Please fill in all settings", Toast.LENGTH_SHORT);
+//                }
+//                btn_toggle_service.setText("STOP SERVICE!");
+//                startService(new Intent(MainActivity.this, SMSTransferService.class));
+//                ToastUtils.makeText("Service STARTED", Toast.LENGTH_SHORT);
+//                serviceRunning = true;
+//            }
 //        }
+
     }
 
 
-    private class SendEmailTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... voids){
-            MimeMessage newEmail = MailUtils.newEmail("this is a test", "hi i am testing");
-            MailUtils.sendEmail(newEmail);
-            return null;
-        }
-    }
 }

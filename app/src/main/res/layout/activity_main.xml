@@ -70,11 +70,11 @@
                 android:layout_height="wrap_content"
                 android:text="Save" />
 
-            <Button
-                android:id="@+id/btn_toggle_service"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Link Start!" />
+<!--            <Button-->
+<!--                android:id="@+id/btn_toggle_service"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Link Start!" />-->
 
 <!--            <Button-->
 <!--                android:id="@+id/btn_send_email"-->

@@ -2,7 +2,6 @@ package ad1024.uw.sms2email;
 
 import android.app.Service;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
@@ -22,16 +21,6 @@ public class SMSTransferService extends Service {
         getContentResolver().registerContentObserver(Uri.parse("content://sms"),
                 true, mObserver);
         super.onCreate();
-
-
-        SharedPreferences preferences = getSharedPreferences("email_storage", MODE_PRIVATE);
-
-        String host =  preferences.getString(Consts.Preference.SERVER_ADDRESS, "");
-        int port = Integer.parseInt(preferences.getString(Consts.Preference.SERVER_PORT, ""));
-        String email = preferences.getString(Consts.Preference.EMAIL, "");
-        String password = preferences.getString(Consts.Preference.PASSWORD, "");
-
-        MailUtils.init(host, port, email, password);
 
     }
 
