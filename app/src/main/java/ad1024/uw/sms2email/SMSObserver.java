@@ -10,6 +10,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.mail.internet.MimeMessage;
 
@@ -59,7 +61,11 @@ public class SMSObserver extends ContentObserver {
                 String body = cursor.getString(cursor.getColumnIndex("body"));
                 String sender = cursor.getString(cursor.getColumnIndex("address"));
                 String dateStamp = cursor.getString(cursor.getColumnIndex("date"));
-                String simId = cursor.getString(cursor.getColumnIndex("sim_id"));
+
+                String simId = "";
+                if(cursor.getColumnIndex("sim_id") != -1) {
+                    simId = cursor.getString(cursor.getColumnIndex("sim_id"));
+                }
 
 //                StringBuffer info = new StringBuffer();
 //                for( int i = 0; i < cursor.getColumnCount(); i++) {
@@ -71,8 +77,10 @@ public class SMSObserver extends ContentObserver {
 
                 Date date = new Date(Long.parseLong(dateStamp));
 
-                String title = "New SMS message from " + sender;
+                String code = getVerificationCode(body);
+                String title = "验证码 " + code + " from "+ sender;
                 String content = "<p>" + body + "</p>" +
+                        "<p> From: " + sender + "</p>" +
                         "<p> SIM ID: " + simId + "</p>" +
                         "<p> Date: " + date + "</p>";
 
@@ -90,6 +98,27 @@ public class SMSObserver extends ContentObserver {
             }
             return null;
         }
+    }
+
+    private String getVerificationCode(String body) {
+        Pattern pattern1 = Pattern.compile("(\\d{6})");
+        Pattern pattern2 = Pattern.compile("(\\d{4})");
+
+        String code = "N/A";
+
+        if(body.contains("验证码") ) {
+            String rest = body.substring(body.indexOf("验证码"));// 从验证码之后开始查找
+            Matcher matcher1 = pattern1.matcher(rest);
+            Matcher matcher2 = pattern2.matcher(rest);
+
+            if (matcher1.find()) {
+                code = matcher1.group(0);
+            } else if (matcher2.find()) {
+                code = matcher2.group(0);
+            }
+        }
+
+        return code;
     }
 
     @Override
