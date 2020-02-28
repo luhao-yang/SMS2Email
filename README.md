@@ -20,9 +20,10 @@ Try it out!
 
 ## NOTE
 
-- must allow SMS2Email to have permissions to read the SMS!
-- Currently, the app won't ask for it, while the user must change the setting manually.
-- The email that is filled in is both for the sender and the receiver.
-- By default, the email using TLS to send emails so must use TLS port.
+# Must allow SMS2Email to have permissions to read the SMS!
+Currently, the app won't ask for it, while the user must change the setting manually.
+
+The email that is filled in is both for the sender and the receiver.
+By default, the email using TLS to send emails so must use TLS port.
 
 
