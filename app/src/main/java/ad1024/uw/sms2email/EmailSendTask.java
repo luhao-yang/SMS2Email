@@ -65,8 +65,12 @@ public class EmailSendTask extends AsyncTask<Void, Void, Void> {
 
             Date date = new Date(Long.parseLong(dateStamp));
 
-            String code = getVerificationCode(body);
-            String title = "验证码 " + code + " from "+ sender;
+            MetaData metaData = extractMetaData(body);
+
+            String title = "无主题";
+            if(metaData.isValid()) {
+                title = metaData.getSenderName() + "验证码" + metaData.getVerificationCode();
+            }
             String content = "<p>" + body + "</p>" +
                     "<p> From: " + sender + "</p>" +
                     "<p> SIM ID: " + simId + "</p>" +
@@ -87,24 +91,56 @@ public class EmailSendTask extends AsyncTask<Void, Void, Void> {
         return null;
     }
 
-    private String getVerificationCode(String body) {
-        Pattern pattern1 = Pattern.compile("(\\d{6})");
-        Pattern pattern2 = Pattern.compile("(\\d{4})");
+    private MetaData extractMetaData(String body) {
+        Pattern codePattern1 = Pattern.compile("(\\d{6})");
+        Pattern codePattern2 = Pattern.compile("(\\d{4})");
 
-        String code = "N/A";
+        Pattern namePattern = Pattern.compile("(【.+】)");
+
+        MetaData metaData = new MetaData();
 
         if(body.contains("验证码") ) {
             String rest = body.substring(body.indexOf("验证码"));// 从验证码之后开始查找
-            Matcher matcher1 = pattern1.matcher(rest);
-            Matcher matcher2 = pattern2.matcher(rest);
+            Matcher matcher1 = codePattern1.matcher(rest);
+            Matcher matcher2 = codePattern2.matcher(rest);
 
             if (matcher1.find()) {
-                code = matcher1.group(0);
+                metaData.setVerificationCode(matcher1.group(0));
             } else if (matcher2.find()) {
-                code = matcher2.group(0);
+                metaData.setVerificationCode(matcher2.group(0));
             }
         }
 
-        return code;
+        Matcher nameMatcher = namePattern.matcher(body);
+        if (nameMatcher.find()) {
+            metaData.setSenderName(nameMatcher.group(0));
+        }
+
+        return metaData;
+    }
+
+
+    class MetaData {
+        private String verificationCode= "";
+        private String senderName = "";
+
+        public void setVerificationCode(String verificationCode) {
+            this.verificationCode = verificationCode;
+        }
+
+        public void setSenderName(String senderName) {
+            this.senderName = senderName;
+        }
+
+        public String getVerificationCode() {
+            return verificationCode;
+        }
+
+        public String getSenderName() {
+            return senderName;
+        }
+        public boolean isValid() {
+            return !verificationCode.isEmpty() && !senderName.isEmpty();
+        }
     }
 }

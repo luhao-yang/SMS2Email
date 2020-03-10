@@ -59,7 +59,7 @@ public class MailUtils {
         MimeMessage message = new MimeMessage(session);
         try {
             // using your email to send emails to yourself
-            message.setFrom(new InternetAddress(email, "SMS2Email", "UTF-8"));
+            message.setFrom(new InternetAddress("donotreply@sms2email.dummy", "SMS2Email", "UTF-8"));
             message.setRecipients(Message.RecipientType.TO, email);
             message.setSubject(title);
             message.setContent(content, "text/html;charset=UTF-8");
