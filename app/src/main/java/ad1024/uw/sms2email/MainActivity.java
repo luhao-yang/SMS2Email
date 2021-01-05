@@ -13,10 +13,13 @@ import android.widget.Toast;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.mail.internet.MimeMessage;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
 
     private Button btn_save_email;
+    private Button btn_send_email;
     private Button btn_toggle_service;
     private EditText ed_email;
     private EditText serverAddrEdit;
@@ -39,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         btn_save_email = findViewById(R.id.btn_save_email);
+        btn_send_email = findViewById(R.id.btn_send_email);
 //        btn_toggle_service = findViewById(R.id.btn_toggle_service);
         serverAddrEdit = findViewById(R.id.server_addr_edit);
         serverPortEdit = findViewById(R.id.server_port_edit);
@@ -55,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        }
 
         btn_save_email.setOnClickListener(this);
+        btn_send_email.setOnClickListener(this);
 //        btn_toggle_service.setOnClickListener(this);
         loadConfiguration();
 
@@ -72,14 +77,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /*
-    * Whether a service named `name` is running
-    * @return: true: is running false: otherwise
-    * */
+     * Whether a service named `name` is running
+     * @return: true: is running false: otherwise
+     * */
     private boolean isServiceRunning(int uid, String name) {
-        List<ActivityManager.RunningServiceInfo> serviceList = ((ActivityManager)getSystemService
+        List<ActivityManager.RunningServiceInfo> serviceList = ((ActivityManager) getSystemService
                 (Context.ACTIVITY_SERVICE)).getRunningServices(Integer.MAX_VALUE);
-        for(ActivityManager.RunningServiceInfo info: serviceList) {
-            if(info.uid == uid) {
+        for (ActivityManager.RunningServiceInfo info : serviceList) {
+            if (info.uid == uid) {
                 return true;
             }
         }
@@ -93,28 +98,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /*
-    * Listener for button clicks
-    * */
+     * Listener for button clicks
+     * */
     @Override
     public void onClick(View view) {
-        if(view.getId() == R.id.btn_save_email) {
-            String email = ed_email.getText().toString();
-            if (!email.isEmpty()) {
-                if (Pattern.matches(REGEX_EMAIL, email)) {
+        boolean valid = validateInput();
+        if (!valid) {
+            ToastUtils.makeText("please input an valid email address!",
+                    Toast.LENGTH_LONG);
+        }
 
-                    String host =  serverAddrEdit.getText().toString();
-                    int port = Integer.parseInt(serverPortEdit.getText().toString());
-                    String password = passwordEdit.getText().toString();
+        if (view.getId() == R.id.btn_save_email) {
+            ToastUtils.makeText("saved and service has started!",
+                    Toast.LENGTH_LONG);
+        } else if (view.getId() == R.id.btn_send_email) {
+            ToastUtils.makeText("test email has been sent!",
+                    Toast.LENGTH_LONG);
 
-                    MailUtils.init(host, port, email, password);
-
-                } else {
-                    ToastUtils.makeText("Are u sure this is an Email address? O_O",
-                            Toast.LENGTH_LONG);
+            new EmailSendTask().execute(new Runnable() {
+                @Override
+                public void run() {
+                    MimeMessage newEmail = MailUtils.newEmail("test title", "test content");
+                    MailUtils.sendEmail(newEmail);
                 }
-            } else {
-                ToastUtils.makeText("Email Should not be EMPTY! Q3Q", Toast.LENGTH_SHORT);
-            }
+            });
         }
 //        else if(view.getId() == R.id.btn_toggle_service) {
 //            if(serviceRunning) {
@@ -133,6 +140,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //            }
 //        }
 
+    }
+
+    public boolean validateInput() {
+        String email = ed_email.getText().toString();
+        if (!email.isEmpty() && Pattern.matches(REGEX_EMAIL, email)) {
+
+            String host = serverAddrEdit.getText().toString();
+            int port = Integer.parseInt(serverPortEdit.getText().toString());
+            String password = passwordEdit.getText().toString();
+
+            MailUtils.init(host, port, email, password);
+            return true;
+        }
+        return false;
     }
 
 

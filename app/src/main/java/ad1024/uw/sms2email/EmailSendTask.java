@@ -21,6 +21,8 @@ public class EmailSendTask extends AsyncTask<Void, Void, Void> {
         this.context = parent;
     }
 
+    public EmailSendTask() { }
+
     @Override
     protected Void doInBackground(Void... voids) {
         Cursor cursor = null;
